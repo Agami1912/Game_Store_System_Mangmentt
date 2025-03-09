@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+    <h1>Game Store Management System</h1>
+    <button onclick="logout()">Logout</button>
+
+    <h2>Games</h2>
+    <button onclick="showAddGameForm()"> Add Game</button>
+    <div id="game-list"></div>
+
+    <h2>Customers</h2>
+    <button onclick="showAddCustomerForm()"> Add Customer</button>
+    <div id="customer-list"></div>
+
+    <h2>Loaned Games</h2>
+    <button onclick="showLoanGameForm()"> Loan Game</button>
+    <div id="loaned-games-list"></div>
+
+    <div id="add-game-form" style="display:none;">
+        <h3>Add Game</h3>
+        <input type="text" id="game-title" placeholder="Title" required>
+        <input type="text" id="game-genre" placeholder="Genre" required>
+        <input type="number" id="game-price" placeholder="Price" required>
+        <input type="number" id="game-quantity" placeholder="Quantity" required>
+        <button onclick="addGame()">Add Game</button>
+        <button onclick="hideAddGameForm()">Cancel</button>
+    </div>
+
+
+    <div id="add-customer-form" style="display:none;">
+        <h3>Add Customer</h3>
+        <input type="text" id="customer-name" placeholder="Name" required>
+        <input type="email" id="customer-email" placeholder="Email" required>
+        <input type="text" id="customer-phone" placeholder="Phone" required>
+        <button onclick="addCustomer()">Add Customer</button>
+        <button onclick="hideAddCustomerForm()">Cancel</button>
+    </div>
+
+
+    <div id="loan-game-form" style="display:none;">
+        <h3>Loan a Game</h3>
+        <select id="loan-game-id">
+            <option value="">Select Game</option>
+        </select>
+        <select id="loan-customer-id">
+            <option value="">Select Customer</option>
+        </select>
+        <button onclick="loanGame()">Loan Game</button>
+        <button onclick="hideLoanGameForm()">Cancel</button>
+    </div>
+
+</body>
+</html>
