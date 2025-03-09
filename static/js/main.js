@@ -34,6 +34,15 @@ function fetchGames() {
         })
         .catch(error => console.error("Error fetching games:", error));
 }
+function deleteGame(gameId) {
+    fetch(`/games/${gameId}`, { method: "DELETE" })
+        .then(response => response.json())
+        .then(() => {
+            fetchGames();
+        })
+        .catch(error => console.error("Error deleting game:", error));
+}
+
 
 function fetchCustomers() {
     fetch("/customers/")
@@ -61,19 +70,32 @@ function fetchCustomers() {
         })
         .catch(error => console.error("Error fetching customers:", error));
 }
+
+
 function fetchLoanedGames() {
     fetch("/loans/")
         .then(response => response.json())
         .then(data => {
             let loanedGamesList = document.getElementById("loaned-games-list");
-            loanedGamesList.innerHTML = "";
+            loanedGamesList.innerHTML = ""; // נקה רשימה לפני עדכון חדש
 
-            data.forEach(loan => {
-                loanedGamesList.innerHTML += `
-                    <p>${loan.title} - Loaned to ${loan.customer}
-                    <button onclick="returnGame(${loan.id})"> Return</button>
-                    </p>`;
-            });
+            if (data.length === 0) {
+                loanedGamesList.innerHTML = "<p>No loans found.</p>";
+            } else {
+                data.forEach(loan => {
+                    let loanItem = document.createElement("p");
+                    loanItem.textContent = `${loan.title} - Loaned to ${loan.customer}`;
+
+                    let returnButton = document.createElement("button");
+                    returnButton.textContent = "Return";
+                    returnButton.onclick = function () {
+                        returnGame(loan.id);
+                    };
+
+                    loanItem.appendChild(returnButton);
+                    loanedGamesList.appendChild(loanItem);
+                });
+            }
         })
         .catch(error => console.error("Error fetching loaned games:", error));
 }
@@ -84,7 +106,7 @@ function loanGame() {
     let gameId = document.getElementById("loan-game-id").value;
     let customerId = document.getElementById("loan-customer-id").value;
 
-    fetch("/loans", {
+    fetch("/loans/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ game_id: gameId, customer_id: customerId })
@@ -99,21 +121,23 @@ function loanGame() {
 }
 
 
-function returnGame(gameId) {
-    fetch(`/loans/${gameId}`, { method: "DELETE" })
+function returnGame(loanId) {
+    fetch(`/loans/loans/${loanId}`, { method: "DELETE" })
+    .then(response => response.json())
     .then(() => {
         fetchGames();
         fetchLoanedGames();
     })
-    .catch(error => console.error("Error returning game:", error));
+     .catch(error => console.error("Error returning game:", error));
 }
-function addGame()      {
+
+function addGame() {
     let title = document.getElementById("game-title").value;
     let genre = document.getElementById("game-genre").value;
     let price = document.getElementById("game-price").value;
     let quantity = document.getElementById("game-quantity").value;
 
-    fetch("/games"  , {
+    fetch("/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, genre, price, quantity })
@@ -126,12 +150,6 @@ function addGame()      {
     .catch(error => console.error("Error adding game:", error));
 }
 
-function deleteGame(gameId) {
-    fetch(`/games/games/${gameId}`, { method: "DELETE" })
-        .then(() => fetchGames())
-        .catch(error => console.error("Error deleting game:", error));
-}
-
 function addCustomer() {
     let name = document.getElementById("customer-name").value;
     let email = document.getElementById("customer-email").value;
@@ -142,12 +160,7 @@ function addCustomer() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, phone })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(() => {
         fetchCustomers();
         hideAddCustomerForm();
@@ -157,35 +170,24 @@ function addCustomer() {
 
 
 function deleteCustomer(customerId) {
-    fetch(`/customers/customers/${customerId}`, { method: "DELETE" })
+    fetch(`/customers/${customerId}`, { method: "DELETE" })
         .then(() => fetchCustomers())
         .catch(error => console.error("Error deleting customer:", error));
 }
 
-function showAddGameForm() {
-    document.getElementById("add-game-form").style.display = "block";
-}
 
-function hideAddGameForm() {
-    document.getElementById("add-game-form").style.display = "none";
-}
-function showLoanGameForm() {
-    document.getElementById("loan-game-form").style.display = "block";
-}
-function hideLoanGameForm() {
-    document.getElementById("loan-game-form").style.display = "none";
-}
+function showAddGameForm() { document.getElementById("add-game-form").style.display = "block"; }
+function hideAddGameForm() { document.getElementById("add-game-form").style.display = "none"; }
 
-function showAddCustomerForm() {
-    document.getElementById("add-customer-form").style.display = "block";
-}
-function hideAddCustomerForm() {
-    document.getElementById("add-customer-form").style.display = "none";
-}
+function showLoanGameForm() { document.getElementById("loan-game-form").style.display = "block"; }
+function hideLoanGameForm() { document.getElementById("loan-game-form").style.display = "none"; }
+
+function showAddCustomerForm() { document.getElementById("add-customer-form").style.display = "block"; }
+function hideAddCustomerForm() { document.getElementById("add-customer-form").style.display = "none"; }
+
+
 function logout() {
-    fetch("/logout", {
-        method: "GET"
-    })
-    .then(() => window.location.href = "/login") // ✅ Redirect to login
+    fetch("/logout", { method: "GET" })
+    .then(() => window.location.href = "/login")
     .catch(error => console.error("Error logging out:", error));
 }

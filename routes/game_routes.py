@@ -3,7 +3,7 @@ from models import db, Game
 
 game_bp = Blueprint("game", __name__)
 
-# ✅ GET all games
+
 @game_bp.route("/games", methods=["GET"])
 def get_games():
     games = Game.query.all()

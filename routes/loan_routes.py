@@ -23,14 +23,12 @@ def loan_game():
     db.session.commit()
     return jsonify({"message": "Game loaned successfully", "quantity": game.quantity}), 201
 
-
 @loan_bp.route("/loans/<int:loan_id>", methods=["DELETE"])
 def return_game(loan_id):
     loan = Loan.query.get_or_404(loan_id)
-
     game = loan.game
-    game.quantity += 1
 
+    game.quantity += 1
     db.session.delete(loan)
     db.session.commit()
 
